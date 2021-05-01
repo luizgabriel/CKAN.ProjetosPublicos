@@ -3,7 +3,7 @@ import CloseIcon from "./CloseIcon";
 import LoadingIcon from "./LoadingIcon";
 import PictureIcon from "./PictureIcon";
 import Button from "./Button";
-import {useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 
 /**
  * @param file {File}
@@ -18,22 +18,28 @@ function readFileAsDataURL(file) {
     });
 }
 
-export default function FileUpload() {
+export default function FileUpload({ onChange }) {
     const fileInputRef = useRef();
     const [files, setFiles] = useState([]);
     const [loading, setLoading] = useState(false);
 
     const onClickOpenFile = () => fileInputRef.current.click();
-    const onChangeFiles = async () => {
+    const onChangeFiles = () => {
         setLoading(true);
-        const newFiles = await Promise.all([].slice.call(fileInputRef.current.files).map(readFileAsDataURL));
-        setFiles((oldFiles) => newFiles.concat(oldFiles));
-        setLoading(false);
+        Promise.all(Array.from(fileInputRef.current.files, readFileAsDataURL))
+            .then(newFiles => {
+                setLoading(false);
+                setFiles((oldFiles) => newFiles.concat(oldFiles));
+            });
     }
 
     const onClickRemoveFile = (file) => {
         setFiles((oldFiles) => oldFiles.filter((f) => f !== file));
     }
+
+    useEffect(() => {
+        onChange(files);
+    }, [files]);
 
     return (
         <div className="flex flex-col">
