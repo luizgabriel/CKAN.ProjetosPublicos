@@ -1,65 +1,63 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import React, {useRef, useState} from 'react'
+import Button from '../components/Button'
+import Container from '../components/Container'
+import FormBody from '../components/FormBody'
+import FormHeader from "../components/FormHeader"
+import Input from '../components/Input'
+import InputGroup from '../components/InputGroup'
+import InputList from '../components/InputList'
+import TextArea from '../components/TextArea'
+import FileUpload from "../components/FileUpload";
 
-export default function Home() {
-  return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+export default function CreateProject() {
+    return (
+        <Container>
+            <FormHeader
+                title="Projetos Públicos"
+                description="Cadastre um novo projeto público no Dataurbe"/>
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
-  )
+            <FormBody>
+                <div className="p-2 w-full">
+                    <div className="relative">
+                        <InputGroup name="name" label="Nome">
+                            <Input/>
+                        </InputGroup>
+                    </div>
+                </div>
+                <div className="p-2 w-full">
+                    <div className="relative">
+                        <InputGroup name="description" label="Descrição">
+                            <TextArea/>
+                        </InputGroup>
+                    </div>
+                </div>
+                <div className="p-2 w-full">
+                    <div className="relative">
+                        <InputGroup name="objectives" label="Objetivos">
+                            <InputList defaultValue={[{value: "", error: false}]} addButtonText="Adicionar Objetivo"/>
+                        </InputGroup>
+                    </div>
+                </div>
+                <div className="p-2 w-full">
+                    <div className="relative">
+                        <InputGroup name="objectives" label="Outras informações">
+                            <InputList defaultValue={[{value: "", error: false}]} addButtonText="Adicionar"/>
+                        </InputGroup>
+                    </div>
+                </div>
+                <div className="p-2 w-full">
+                    <div className="relative">
+                        <InputGroup name="images" label="Imagens">
+                            <FileUpload/>
+                        </InputGroup>
+                    </div>
+                </div>
+                <div className="border-t border-gray-200 w-full my-4"/>
+                <div className="p-2 w-full text-center">
+                    <Button color="blue" textSize="xl" className="mx-auto px-8 mb-2">Cadastrar no Dataurbe</Button>
+                    <span className="text-gray-500 text-sm">Clique para cadastrar este projeto público no Dataurbe</span>
+                </div>
+            </FormBody>
+        </Container>
+    )
 }
