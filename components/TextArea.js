@@ -1,10 +1,21 @@
 import {useContext} from "react";
 import {InputGroupContext} from "./InputGroup";
+import {FormContext} from "./Form";
 
 export default function TextArea({name, error, onChangeValue, ...rest}) {
-	const context = useContext(InputGroupContext);
-	name = name || context.name;
-	error = error || context.error;
+	const inputGroupContext = useContext(InputGroupContext);
+	const formContext = useContext(FormContext);
+
+	name = name || inputGroupContext.name;
+	error = error || inputGroupContext.error;
+	if (!rest.onChange || !onChangeValue) {
+		onChangeValue = (value) => formContext.onChange(name, value);
+	}
+
+	if (!rest.defaultValue) {
+		rest.defaultValue = formContext.data[name];
+	}
+
 	return (
 		<textarea
 			id={name}

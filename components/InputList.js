@@ -3,12 +3,18 @@ import Button from "./Button";
 import Input from "./Input";
 import {InputGroupContext} from "./InputGroup";
 import TrashIcon from "./TrashIcon";
+import {FormContext} from "./Form";
 
 export default function InputList({name, error, defaultValue, addButtonText, onChange}) {
-	const context = useContext(InputGroupContext);
-	name = name || context.name;
-	error = error || context.error;
-	const [value, setValue] = useState(defaultValue || []);
+	const inputGroupContext = useContext(InputGroupContext);
+	const formContext = useContext(FormContext);
+	name = name || inputGroupContext.name;
+	error = error || inputGroupContext.error;
+	const [value, setValue] = useState(defaultValue || [{value: "", error: false}]);
+
+	if (!onChange) {
+		onChange = (value) => formContext.onChange(name, value);
+	}
 
 	function onAddInput() {
 		setValue((old) => old.concat({value: null, error: false}));

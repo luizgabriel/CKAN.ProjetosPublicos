@@ -3,7 +3,9 @@ import CloseIcon from "./CloseIcon";
 import LoadingIcon from "./LoadingIcon";
 import PictureIcon from "./PictureIcon";
 import Button from "./Button";
-import {useEffect, useRef, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
+import {FormContext} from "./Form";
+import {InputGroupContext} from "./InputGroup";
 
 /**
  * @param file {File}
@@ -18,10 +20,18 @@ function readFileAsDataURL(file) {
 	});
 }
 
-export default function FileUpload({onChange}) {
+export default function FileUpload({name, onChange}) {
+	const inputGroupContext = useContext(InputGroupContext);
+	const formContext = useContext(FormContext);
+	name = name || inputGroupContext.name;
+
 	const fileInputRef = useRef();
 	const [files, setFiles] = useState([]);
 	const [loading, setLoading] = useState(false);
+
+	if (!onChange) {
+		onChange = (value) => formContext.onChange(name, value);
+	}
 
 	const onClickOpenFile = () => fileInputRef.current.click();
 	const onChangeFiles = () => {

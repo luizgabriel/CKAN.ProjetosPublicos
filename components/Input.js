@@ -1,12 +1,21 @@
 import {forwardRef, useContext} from "react";
 import {InputGroupContext} from "./InputGroup";
+import {FormContext} from "./Form";
 
 function Input({type, name, error, rounded, hidden, onChangeValue, ...rest}, ref) {
-	const context = useContext(InputGroupContext);
+	const inputGroupContext = useContext(InputGroupContext);
+	const formContext = useContext(FormContext);
 	type = type || "text";
-	name = name || context.name;
-	error = error || context.error;
+	name = name || inputGroupContext.name;
+	error = error || inputGroupContext.error;
 	rounded = rounded || "rounded";
+
+	if (!rest.onChange || !rest.onChangeValue)
+		onChangeValue = (value) => formContext.onChange(name, value);
+
+	if (!rest.defaultValue) {
+		rest.defaultValue = formContext.data[name];
+	}
 
 	return (
 		<input
