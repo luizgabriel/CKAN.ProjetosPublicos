@@ -1,9 +1,20 @@
-export default function Button({children, textSize, color, rounded, disabled, className, ...rest}) {
+export default function Button({children, textSize, color, rounded, disabled, className, light, ...rest}) {
 	textSize = textSize || "md";
 	rounded = rounded || "rounded";
-	color = disabled ? "gray" : color;
-	const bgColorValue = disabled ? 300 : 500;
-	const bgHoverColorValue = disabled ? 400 : 600;
+
+	if (disabled) {
+		color = "gray";
+		light = true;
+	}
+
+	let bgColorValue = 500;
+	if (light)
+		bgColorValue -= 200;
+
+	let bgHoverColorValue = 600;
+	if (light)
+		bgHoverColorValue -= 200;
+
 	const cursor = disabled ? "cursor-not-allowed" : "";
 
 	return (

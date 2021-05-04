@@ -1,85 +1,115 @@
-import React, {useCallback, useEffect, useState} from "react";
-import Button from "../components/Button";
+import React, {useCallback} from "react";
 import Container from "../components/Container";
-import FormBody from "../components/FormBody";
 import FormHeader from "../components/FormHeader";
-import Input from "../components/Input";
-import InputGroup from "../components/InputGroup";
-import InputList from "../components/InputList";
-import TextArea from "../components/TextArea";
-import FileUpload from "../components/FileUpload";
-import axios from "axios";
-import LoadingIcon from "../components/LoadingIcon";
-import Form from "../components/Form";
-import Select from "../components/Select";
+import CreateProjectForm from "../components/CreateProjectForm";
+import {sendRequest} from "../utils/request";
+import slugify from "slugify";
+import {createCkanRequest, createPackageRequest, createResourceRequest} from "../utils/ckan";
+import {useCkanCredentials, useOrganizations} from "../utils/hooks";
 
-const CKAN_SERVER = "https://a75c9042-d964-4434-b957-d180f61c1a3d.mock.pstmn.io";
-const CKAN_API_KEY = "";
+function parseDescription(data) {
+	const objectivesTitle = "Objetivos";
+	const metaDataTitle = "Informações Extra";
+	const benefitsTitle = "Benefício / Beneficiários";
 
-function createCkanRequest(config, ckanServer = CKAN_SERVER, apiKey = CKAN_API_KEY) {
-	return {
-		baseURL: ckanServer + "/api/action/",
-		headers: {
-			Authorization: apiKey,
-		},
-		...config,
+	const nonEmptyString = (str) => str && String(str).trim() !== "";
+
+	let description = data.description;
+
+	if (nonEmptyString(data.benefit)) {
+		description += `\n\n#### ${benefitsTitle}\n${data.benefit}`;
 	}
-}
 
-async function sendRequest(config) {
-	const response = await axios(config);
-	return response.data;
-}
-
-async function getOrganizations() {
-	const response = await sendRequest(createCkanRequest({
-		method: "GET",
-		url: "organization_list",
-		params: {
-			all_fields: true
+	const objectives = data.objectives.filter(nonEmptyString);
+	if (objectives && objectives.length > 0) {
+		let objectivesText = `\n\n#### ${objectivesTitle}\n`;
+		for (const objective of objectives) {
+			objectivesText += `- ${objective.value}\n`;
 		}
-	}));
 
-	return response.result;
+		description += objectivesText;
+	}
+
+	const metaData = data.metaData.filter((item) => nonEmptyString(item.name));
+	if (metaData && metaData.length > 0) {
+		let metaDataText = `\n\n\n#### ${metaDataTitle}\n`;
+		for (const metaItem of metaData) {
+			metaDataText += `- __${metaItem.name}__: ${metaItem.value}\n`;
+		}
+
+		description += metaDataText;
+	}
+
+	return description;
 }
 
-async function createPackage(data) {
-	return await sendRequest(createCkanRequest({
-		method: "POST",
-		url: "package_create",
-		data,
-	}));
-}
-
-function mapOrganizationToOption(organization) {
+/**
+ * name (string) – the name of the new dataset, must be between 2 and 100 characters long and contain only lowercase alphanumeric characters, - and _, e.g. 'warandpeace'
+title (string) – the title of the dataset (optional, default: same as name)
+private (bool) – If True creates a private dataset
+author (string) – the name of the dataset’s author (optional)
+author_email (string) – the email address of the dataset’s author (optional)
+maintainer (string) – the name of the dataset’s maintainer (optional)
+maintainer_email (string) – the email address of the dataset’s maintainer (optional)
+license_id (license id string) – the id of the dataset’s license, see license_list() for available values (optional)
+notes (string) – a description of the dataset (optional)
+url (string) – a URL for the dataset’s source (optional)
+version (string, no longer than 100 characters) – (optional)
+state (string) – the current state of the dataset, e.g. 'active' or 'deleted', only active datasets show up in search results and other lists of datasets, this parameter will be ignored if you are not authorized to change the state of the dataset (optional, default: 'active')
+type (string) – the type of the dataset (optional), IDatasetForm plugins associate themselves with different dataset types and provide custom dataset handling behaviour for these types
+resources (list of resource dictionaries) – the dataset’s resources, see resource_create() for the format of resource dictionaries (optional)
+tags (list of tag dictionaries) – the dataset’s tags, see tag_create() for the format of tag dictionaries (optional)
+extras (list of dataset extra dictionaries) – the dataset’s extras (optional), extras are arbitrary (key: value) metadata items that can be added to datasets, each extra dictionary should have keys 'key' (a string), 'value' (a string)
+relationships_as_object (list of relationship dictionaries) – see package_relationship_create() for the format of relationship dictionaries (optional)
+relationships_as_subject (list of relationship dictionaries) – see package_relationship_create() for the format of relationship dictionaries (optional)
+groups (list of dictionaries) – the groups to which the dataset belongs (optional), each group dictionary should have one or more of the following keys which identify an existing group: 'id' (the id of the group, string), or 'name' (the name of the group, string), to see which groups exist call group_list()
+owner_org (string) – the id of the dataset’s owning organization, see organization_list() or organization_list_for_user() for available values (optional)
+ */
+function mapFormDataToCreatePackagePayload(data) {
+	console.log({data});
 	return {
-		name: organization.display_name,
-		value: organization.name
+		name: slugify(data.name).slice(0, 100),
+		title: data.name,
+		private: false,
+		notes: parseDescription(data),
+		tags: data.categories.map((item) => ({
+			name: slugify(item).slice(0, 100),
+		})),
+		owner_org: data.organization,
 	};
 }
 
-function mapFormDataToCreatePackagePayload(data) {
-	console.log(data);
-	return {};
-}
+const createPackage = async (data, ckanServer, apiKey) => {
+	const packageData = await sendRequest(
+		createCkanRequest(ckanServer, apiKey)(
+			createPackageRequest(
+				mapFormDataToCreatePackagePayload(data)
+			)
+		)
+	);
+
+	await Promise.all(data.images.map(image => {
+		return sendRequest(
+			createCkanRequest(ckanServer, apiKey)(
+				createResourceRequest(
+					image.file, packageData.id
+				)
+			)
+		)
+	}))
+
+	return packageData;
+};
 
 export default function CreateProject() {
-	const [data, setData] = useState({});
-	const [organizations, setOrganizations] = useState([]);
-	const [loading, setLoading] = useState(false);
-
-	const onClickRegister = useCallback(async () => {
-		setLoading(true);
-		try {
-			await createPackage(mapFormDataToCreatePackagePayload(data));
-		} catch (e) {
+	const [ckanCredentials, loadingCkanCredentials] = useCkanCredentials();
+	const [organizations, loadingOrganizations] = useOrganizations(ckanCredentials.host, ckanCredentials.apiKey);
+	const onSubmit = useCallback(async (data) => {
+		if (ckanCredentials && !loadingCkanCredentials) {
+			const response = await createPackage(data, ckanCredentials.host, ckanCredentials.apiKey);
+			window.open(ckanCredentials.host + "dataset/" + response.id);
 		}
-		setLoading(false);
-	}, [data]);
-
-	useEffect(() => {
-		getOrganizations().then((orgs) => setOrganizations(orgs.map(mapOrganizationToOption)));
-	}, []);
+	}, [ckanCredentials, loadingCkanCredentials]);
 
 	return (
 		<Container>
@@ -87,38 +117,10 @@ export default function CreateProject() {
 				title="Projetos Públicos"
 				description="Cadastre um novo projeto público no Dataurbe"/>
 
-			<Form onChange={setData}>
-				<FormBody>
-					<InputGroup name="name" label="Nome" className="p-2 w-full">
-						<Input/>
-					</InputGroup>
-					<InputGroup name="organization" label="Organização" className="p-2 w-full">
-						<Select options={organizations} unselectedText="Selecione uma organização"/>
-					</InputGroup>
-					<InputGroup name="description" label="Descrição" className="p-2 w-full">
-						<TextArea/>
-					</InputGroup>
-					<InputGroup name="objetives" label="Objetivos" className="p-2 w-full">
-						<InputList addButtonText="Adicionar Objetivo"/>
-					</InputGroup>
-					<InputGroup name="metaData" label="Outras informações" className="p-2 w-full">
-						<InputList addButtonText="Adicionar"/>
-					</InputGroup>
-					<InputGroup name="images" label="Imagens" className="p-2 w-full">
-						<FileUpload/>
-					</InputGroup>
-					<div className="border-t border-gray-200 w-full my-4"/>
-					<div className="p-2 w-full flex flex-col items-center justify-center">
-						<Button color="blue" textSize="xl" className="mx-auto px-8 mb-2" onClick={onClickRegister}>
-							{loading ? <LoadingIcon className="mr-2"/> : null}
-							Cadastrar no Dataurbe
-						</Button>
-						<span className="text-gray-500 text-sm text-center">
-							Clique para cadastrar este projeto público no Dataurbe
-						</span>
-					</div>
-				</FormBody>
-			</Form>
+			<CreateProjectForm
+				organizations={organizations}
+				loadingOrganizations={loadingOrganizations}
+				onSubmit={onSubmit}/>
 		</Container>
 	);
 }

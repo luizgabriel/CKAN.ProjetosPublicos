@@ -6,6 +6,7 @@ import Button from "./Button";
 import {useContext, useEffect, useRef, useState} from "react";
 import {FormContext} from "./Form";
 import {InputGroupContext} from "./InputGroup";
+import withSession from "../utils/session";
 
 /**
  * @param file {File}
@@ -36,15 +37,24 @@ export default function FileUpload({name, onChange}) {
 	const onClickOpenFile = () => fileInputRef.current.click();
 	const onChangeFiles = () => {
 		setLoading(true);
-		Promise.all(Array.from(fileInputRef.current.files, readFileAsDataURL))
+		Promise.all(
+			Array.from(fileInputRef.current.files).map(async (file) => ({
+				file,
+				dataUrl: await readFileAsDataURL(file)
+			}))
+		)
 			.then(newFiles => {
 				setLoading(false);
 				setFiles((oldFiles) => newFiles.concat(oldFiles));
 			});
 	};
 
-	const onClickRemoveFile = (file) => {
-		setFiles((oldFiles) => oldFiles.filter((f) => f !== file));
+	const onClickRemoveFile = (index) => {
+		setFiles((oldFiles) => {
+			const newFiles = [...oldFiles];
+			newFiles.splice(index, 1);
+			return newFiles;
+		});
 	};
 
 	useEffect(() => {
@@ -58,13 +68,13 @@ export default function FileUpload({name, onChange}) {
 
 			<div className="flex flex-row">
 
-				{files.slice(1, 4).map((file, i) => (
+				{files.slice(0, 3).map((file, i) => (
 					<button key={i}
 						className="flex items-center justify-center rounded w-1/2 sm:w-1/3 md:w-1/4 bg-gray-600 overflow-hidden mr-2 h-50 relative"
-						onClick={() => onClickRemoveFile(file)}>
+						onClick={() => onClickRemoveFile(i)}>
 						<CloseIcon size="4"
 							className="absolute top-2 right-2 z-30 text-white bg-gray-800 rounded-full p-0.5 shadow-sm cursor-pointer"/>
-						<img src={file} alt="" className="w-full"/>
+						<img src={file.dataUrl} alt="" className="w-full"/>
 					</button>
 				))}
 
@@ -88,4 +98,4 @@ export default function FileUpload({name, onChange}) {
 
 		</div>
 	);
-}
+};

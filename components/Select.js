@@ -2,10 +2,10 @@ import {useContext, useEffect, useState} from "react";
 import {InputGroupContext} from "./InputGroup";
 import {FormContext} from "./Form";
 
-export default function Select({name, error, options, unselectedText, onChange, ...rest}) {
+export default function Select({name, error, options, unselectedText, defaultValue, onChange, ...rest}) {
 	const inputGroupContext = useContext(InputGroupContext);
 	const formContext = useContext(FormContext);
-	const [selectedOption, setSelectedOption] = useState(null);
+	const [selectedOption, setSelectedOption] = useState(defaultValue);
 
 	name = name || inputGroupContext.name;
 	error = error || inputGroupContext.error;
@@ -22,12 +22,13 @@ export default function Select({name, error, options, unselectedText, onChange, 
 		<select
 			id={name}
 			name={name}
+			defaultValue={defaultValue}
 			onChange={onChangeSelectInput}
 			{...rest}
 			className={`w-full bg-gray-100 bg-opacity-50 rounded border focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200 text-base outline-none text-gray-700 py-2 px-3 leading-8 transition-colors duration-200 ease-in-out ${error ? "border-red-700" : "border-gray-300"}`}>
-			<option selected={selectedOption === null}>{unselectedText}</option>
+			<option>{unselectedText}</option>
 			{options.map((option, i) => (
-				<option key={i} value={option.value} selected={selectedOption === option.value}>{option.name}</option>
+				<option key={i} value={option.value}>{option.name}</option>
 			))}
 		</select>
 	);

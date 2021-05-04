@@ -1,5 +1,4 @@
 export default function PictureIcon({size, className}) {
-	size = size || 4;
 	return (
 		<svg className={`w-${size} h-${size} ${className}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
 			fill="currentColor">
