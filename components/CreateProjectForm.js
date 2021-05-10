@@ -39,7 +39,7 @@ export default function CreateProjectForm({initialData, organizations, loadingOr
 	const [data, setData] = useState(initialData || {});
 	const [errors, setErrors] = useState({});
 	const [loading, setLoading] = useState(false);
-	
+
 	const nameInputRef = useRef();
 	const benefitInputRef = useRef();
 
@@ -50,10 +50,10 @@ export default function CreateProjectForm({initialData, organizations, loadingOr
 		if (Object.entries(validationErrors).length > 0) {
 			setLoading(false);
 			setErrors(validationErrors);
-			
+
 			if (validationErrors.name && nameInputRef.current && nameInputRef.current.scrollIntoView)
-				nameInputRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-			
+				nameInputRef.current.scrollIntoView({behavior: "smooth", block: "center"});
+
 		} else {
 			setErrors({});
 			onSubmit(data)
@@ -67,10 +67,9 @@ export default function CreateProjectForm({initialData, organizations, loadingOr
 
 	useEffect(() => {
 		if (errors.name && nameInputRef.current && nameInputRef.current.scrollIntoView)
-			nameInputRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
-
-		if (errors.benefit && benefitInputRef.current && benefitInputRef.current.scrollIntoView)
-			benefitInputRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+			nameInputRef.current.scrollIntoView({behavior: "smooth", block: "center"});
+		else if (errors.benefit && benefitInputRef.current && benefitInputRef.current.scrollIntoView)
+			benefitInputRef.current.scrollIntoView({behavior: "smooth", block: "center"});
 
 	}, [errors, nameInputRef, benefitInputRef]);
 
@@ -81,7 +80,8 @@ export default function CreateProjectForm({initialData, organizations, loadingOr
 					<Input ref={nameInputRef}/>
 				</InputGroup>
 				<InputGroup name="organization" label="Organização" className="p-2 w-full">
-					<Select options={organizations} unselectedText={"Selecione uma organização" + (loadingOrganizations ? " (carregando...)" : "")}/>
+					<Select options={organizations}
+					        unselectedText={"Selecione uma organização" + (loadingOrganizations ? " (carregando...)" : "")}/>
 				</InputGroup>
 				<InputGroup name="description" label="Descrição" className="p-2 w-full">
 					<TextArea rows="4"/>
