@@ -49,7 +49,12 @@ export default function CreateProjectForm({initialData, organizations, loadingOr
 			setErrors(validationErrors);
 		} else {
 			setErrors({});
-			onSubmit(data).then(() => setLoading(false));
+			onSubmit(data)
+				.catch((e) => {
+					console.error(e);
+					setErrors({name: "Não foi possível cadastrar este projeto. Este nome já está em uso!"});
+				})
+				.finally(() => setLoading(false));
 		}
 	}, [data]);
 
@@ -102,7 +107,6 @@ export default function CreateProjectForm({initialData, organizations, loadingOr
 								Clique para cadastrar este projeto público no Dataurbe
 							</span>
 						)}
-
 				</div>
 			</FormBody>
 		</Form>

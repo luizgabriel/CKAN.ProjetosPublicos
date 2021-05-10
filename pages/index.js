@@ -6,12 +6,17 @@ import {sendRequest} from "../utils/request";
 import slugify from "slugify";
 import {createCkanRequest, createPackageRequest, createResourceRequest} from "../utils/ckan";
 import {useCkanCredentials, useOrganizations} from "../utils/hooks";
-import SearchIcon from "../components/SearchIcon";
+import Header from "../components/Header";
+import Box from "../components/Box";
+import Modal, {ModalBodyIcon, ModalFooter} from "../components/Modal";
+import ExclamationIcon from "../components/ExclamationIcon";
 
 function parseDescription(data) {
 	const objectivesTitle = "Objetivos";
 	const metaDataTitle = "Informações Extra";
 	const benefitsTitle = "Benefício / Beneficiários";
+
+	console.log({formData: data});
 
 	const nonEmptyString = (str) => str && String(str).trim() !== "";
 
@@ -21,8 +26,8 @@ function parseDescription(data) {
 		description += `\n\n#### ${benefitsTitle}\n${data.benefit}`;
 	}
 
-	const objectives = data.objectives.filter(nonEmptyString);
-	if (objectives && objectives.length > 0) {
+	const objectives = (data.objectives || []).filter((item) => nonEmptyString(item.value));
+	if (objectives.length > 0) {
 		let objectivesText = `\n\n#### ${objectivesTitle}\n`;
 		for (const objective of objectives) {
 			objectivesText += `- ${objective.value}\n`;
@@ -31,8 +36,8 @@ function parseDescription(data) {
 		description += objectivesText;
 	}
 
-	const metaData = data.metaData.filter((item) => nonEmptyString(item.name));
-	if (metaData && metaData.length > 0) {
+	const metaData = (data.metaData || []).filter((item) => nonEmptyString(item.name));
+	if (metaData.length > 0) {
 		let metaDataText = `\n\n\n#### ${metaDataTitle}\n`;
 		for (const metaItem of metaData) {
 			metaDataText += `- __${metaItem.name}__: ${metaItem.value}\n`;
@@ -68,7 +73,7 @@ owner_org (string) – the id of the dataset’s owning organization, see organi
  */
 function mapFormDataToCreatePackagePayload(data) {
 	return {
-		name: slugify(data.name).slice(0, 100),
+		name: slugify(data.name.toLowerCase()).slice(0, 100),
 		title: data.name,
 		private: false,
 		notes: parseDescription(data),
@@ -95,47 +100,51 @@ const createPackage = async (data, ckanServer, apiKey) => {
 					image.file, packageData.id
 				)
 			)
-		)
-	}))
+		);
+	}));
 
 	return packageData;
 };
 
-function Header() {
+function EmptyCredentialsModal() {
 	return (
-		<div className="text-gray-600 body-font relative"
-		     style={{backgroundColor: "#13326b", backgroundImage: "url(/bg.png)", height: 115}}>
-			<div className="container px-5 py-10 mx-auto flex flex-row mx-10">
-				<div className="mt-5 mb-5">
-					<img src="/fgv-data.png" alt="Dataurbe" className="h-7"/>
+		<Modal>
+			<ModalBodyIcon iconColor="red=600" IconComponent={ExclamationIcon}>
+				<h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+					Não autorizado!
+				</h3>
+				<div className="mt-2">
+					<p className="text-sm text-gray-500">
+						Você não está autenticado para realizar esta ação.
+					</p>
 				</div>
-				<div className="flex flex-row mt-5 mb-5 text-lg ml-auto">
-					<a className="text-white mr-2" href="https://dataurbe.appcivico.com/dataset">Conjunto de dados</a>
-					<span className="text-white mr-2">|</span>
-					<a className="text-white" href="https://dataurbe.appcivico.com/organization">Cidades</a>
-					<form method="get" action="https://dataurbe.appcivico.com/dataset" className="relative">
-						<input className="bg-white px-2 py-0 text-sm border rounded ml-2" name="q"
-						       placeholder="Pesquisar"/>
-						<button type="submit" className="absolute right-1 top-2">
-							<SearchIcon size="4"/>
-						</button>
-					</form>
-				</div>
-			</div>
-		</div>
+			</ModalBodyIcon>
+		</Modal>
 	);
 }
 
-function Box({children}) {
+function ErrorModal() {
 	return (
-		<div className="bg-white rounded p-4 py-20" style={{boxShadow: "0 0 0 4px rgb(0 0 0 / 5%)"}}>
-			{children}
-		</div>
+		<Modal>
+			<ModalBodyIcon iconColor="red=600" IconComponent={ExclamationIcon}>
+				<h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+					Não foi possível se conectar ao DataUrbe!
+				</h3>
+				<div className="mt-2">
+					<p className="text-sm text-gray-500">
+						Algo aconteceu ao tentar se comunicar com o Dataurbe. <br/>
+						É bem provável que as suas credenciais estejam inválidas.
+					</p>
+				</div>
+			</ModalBodyIcon>
+		</Modal>
 	);
 }
 
 export default function CreateProject() {
 	const [ckanCredentials, loadingCkanCredentials] = useCkanCredentials();
+	const emptyCredentials = !loadingCkanCredentials && (!ckanCredentials.host || !ckanCredentials.apiKey);
+
 	const [organizations, loadingOrganizations] = useOrganizations(ckanCredentials.host, ckanCredentials.apiKey);
 	const onSubmit = useCallback(async (data) => {
 		if (ckanCredentials && !loadingCkanCredentials) {
@@ -144,10 +153,14 @@ export default function CreateProject() {
 		}
 	}, [ckanCredentials, loadingCkanCredentials]);
 
+	const emptyOrganizations = !emptyCredentials && !loadingOrganizations && organizations.length === 0;
+
 	return (
 		<>
 			<Header/>
 			<Container>
+				{emptyCredentials ? <EmptyCredentialsModal /> : null}
+				{emptyOrganizations ? <ErrorModal/> : null}
 				<Box>
 					<FormHeader
 						title="Projetos Públicos"

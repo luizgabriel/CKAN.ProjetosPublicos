@@ -31,7 +31,8 @@ export function useOrganizations(ckanServer, apiKey) {
 			getOrganizations(ckanServer, apiKey)
 				.then(map(mapOrganizationToOption))
 				.then(setResult)
-				.then(() => setLoading(false));
+				.catch((e) => console.error(e))
+				.finally(() => setLoading(false));
 	}, [ckanServer, apiKey]);
 
 	return [result, loading];
