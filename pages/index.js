@@ -90,23 +90,25 @@ function mapFormDataToCreatePackagePayload(data) {
 }
 
 const createPackage = async (data, ckanServer, apiKey) => {
+	const ckanMakeRequest = createCkanRequest(ckanServer, apiKey);
+
 	const packageData = await sendRequest(
-		createCkanRequest(ckanServer, apiKey)(
+		ckanMakeRequest(
 			createPackageRequest(
 				mapFormDataToCreatePackagePayload(data)
 			)
 		)
 	);
 
-	await Promise.all(data.images.map(image => {
-		return sendRequest(
-			createCkanRequest(ckanServer, apiKey)(
+	for (const image of data.images) {
+		await sendRequest(
+			ckanMakeRequest(
 				createResourceRequest(
 					image.file, packageData.id
 				)
 			)
 		);
-	}));
+	}
 
 	return packageData;
 };
