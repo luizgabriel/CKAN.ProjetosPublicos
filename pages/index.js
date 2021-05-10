@@ -101,13 +101,17 @@ const createPackage = async (data, ckanServer, apiKey) => {
 	);
 
 	for (const image of data.images) {
-		await sendRequest(
-			ckanMakeRequest(
-				createResourceRequest(
-					image.file, packageData.id
+		try {
+			await sendRequest(
+				ckanMakeRequest(
+					createResourceRequest(
+						image.file, packageData.id
+					)
 				)
-			)
-		);
+			);
+		} catch (e) {
+			console.error(e);
+		}
 	}
 
 	return packageData;
