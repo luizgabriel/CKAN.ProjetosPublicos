@@ -8,7 +8,7 @@ import FileUpload from "./FileUpload";
 import Button from "./Button";
 import LoadingIcon from "./LoadingIcon";
 import Form from "./Form";
-import React, {useCallback, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import TagsInput from "./TagsInput";
 import MetaInputList from "./MetaInputList";
 import InputError from "./InputError";
@@ -39,6 +39,9 @@ export default function CreateProjectForm({initialData, organizations, loadingOr
 	const [data, setData] = useState(initialData || {});
 	const [errors, setErrors] = useState({});
 	const [loading, setLoading] = useState(false);
+	
+	const nameInputRef = useRef();
+	const benefitInputRef = useRef();
 
 	const onClickSubmit = useCallback(() => {
 		setLoading(true);
@@ -47,6 +50,10 @@ export default function CreateProjectForm({initialData, organizations, loadingOr
 		if (Object.entries(validationErrors).length > 0) {
 			setLoading(false);
 			setErrors(validationErrors);
+			
+			if (validationErrors.name && nameInputRef.current && nameInputRef.current.scrollIntoView)
+				nameInputRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+			
 		} else {
 			setErrors({});
 			onSubmit(data)
@@ -58,11 +65,20 @@ export default function CreateProjectForm({initialData, organizations, loadingOr
 		}
 	}, [data]);
 
+	useEffect(() => {
+		if (errors.name && nameInputRef.current && nameInputRef.current.scrollIntoView)
+			nameInputRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+
+		if (errors.benefit && benefitInputRef.current && benefitInputRef.current.scrollIntoView)
+			benefitInputRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+
+	}, [errors, nameInputRef, benefitInputRef]);
+
 	return (
 		<Form onChange={setData} errors={errors}>
 			<FormBody>
 				<InputGroup name="name" label="Nome" className="p-2 w-full">
-					<Input/>
+					<Input ref={nameInputRef}/>
 				</InputGroup>
 				<InputGroup name="organization" label="Organização" className="p-2 w-full">
 					<Select options={organizations} unselectedText={"Selecione uma organização" + (loadingOrganizations ? " (carregando...)" : "")}/>
@@ -74,7 +90,7 @@ export default function CreateProjectForm({initialData, organizations, loadingOr
 					<InputList addButtonText="Adicionar Objetivo"/>
 				</InputGroup>
 				<InputGroup name="benefit" label="Benefício / Beneficiários" className="p-2 w-full">
-					<TextArea rows="2"/>
+					<TextArea rows="2" ref={benefitInputRef}/>
 				</InputGroup>
 				<InputGroup name="metaData" label="Outras informações" className="p-2 w-full">
 					<MetaInputList addButtonText="Adicionar" defaultValue={[
