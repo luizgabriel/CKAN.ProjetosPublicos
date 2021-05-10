@@ -81,6 +81,11 @@ function mapFormDataToCreatePackagePayload(data) {
 			name: slugify(item).slice(0, 100),
 		})),
 		owner_org: data.organization,
+		groups: [
+			{
+				name: "projetos-publicos"
+			}
+		]
 	};
 }
 
