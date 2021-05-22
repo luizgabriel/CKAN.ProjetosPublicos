@@ -6,7 +6,6 @@ import Button from "./Button";
 import {useContext, useEffect, useRef, useState} from "react";
 import {FormContext} from "./Form";
 import {InputGroupContext} from "./InputGroup";
-import withSession from "../utils/session";
 
 /**
  * @param file {File}
@@ -21,7 +20,7 @@ function readFileAsDataURL(file) {
 	});
 }
 
-export default function FileUpload({name, onChange}) {
+export default function ImagesUpload({name, onChange}) {
 	const inputGroupContext = useContext(InputGroupContext);
 	const formContext = useContext(FormContext);
 	name = name || inputGroupContext.name;
@@ -64,7 +63,7 @@ export default function FileUpload({name, onChange}) {
 	return (
 		<div className="flex flex-col">
 
-			<Input type="file" ref={fileInputRef} onChange={onChangeFiles} multiple hidden/>
+			<Input type="file" ref={fileInputRef} onChange={onChangeFiles} accept="image/*" multiple hidden/>
 
 			<div className="flex flex-row">
 

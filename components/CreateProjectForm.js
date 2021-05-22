@@ -4,7 +4,7 @@ import Input from "./Input";
 import Select from "./Select";
 import TextArea from "./TextArea";
 import InputList from "./InputList";
-import FileUpload from "./FileUpload";
+import ImagesUpload from "./ImagesUpload";
 import Button from "./Button";
 import LoadingIcon from "./LoadingIcon";
 import Form from "./Form";
@@ -12,6 +12,7 @@ import React, {useCallback, useEffect, useRef, useState} from "react";
 import TagsInput from "./TagsInput";
 import MetaInputList from "./MetaInputList";
 import InputError from "./InputError";
+import FilesUpload from "./FilesUpload";
 
 const requiredMessage = (fieldName) => `O campo "${fieldName}" é obrigatório`;
 
@@ -76,12 +77,13 @@ export default function CreateProjectForm({initialData, organizations, loadingOr
 	return (
 		<Form onChange={setData} errors={errors}>
 			<FormBody>
-				<InputGroup name="name" label="Nome" className="p-2 w-full">
+				<InputGroup name="name" label="Nome do projeto" className="p-2 w-full">
 					<Input ref={nameInputRef}/>
+					<div className="text-xs text-gray-400 mt-1"><b>Exemplo:</b> Reparação da Rua 01</div>
 				</InputGroup>
-				<InputGroup name="organization" label="Organização" className="p-2 w-full">
+				<InputGroup name="organization" label="Cidade" className="p-2 w-full">
 					<Select options={organizations}
-					        unselectedText={"Selecione uma organização" + (loadingOrganizations ? " (carregando...)" : "")}/>
+					        unselectedText={"Selecione uma cidade" + (loadingOrganizations ? " (carregando...)" : "")}/>
 				</InputGroup>
 				<InputGroup name="description" label="Descrição" className="p-2 w-full">
 					<TextArea rows="4"/>
@@ -107,7 +109,10 @@ export default function CreateProjectForm({initialData, organizations, loadingOr
 					<TagsInput/>
 				</InputGroup>
 				<InputGroup name="images" label="Imagens" className="p-2 w-full">
-					<FileUpload/>
+					<ImagesUpload/>
+				</InputGroup>
+				<InputGroup name="files" label="Arquivos" className="p-2 w-full">
+					<FilesUpload placeholder="Anexe arquivos ao projeto"/>
 				</InputGroup>
 				<div className="border-t border-gray-200 w-full my-4"/>
 				<div className="p-2 w-full flex flex-col items-center justify-center">

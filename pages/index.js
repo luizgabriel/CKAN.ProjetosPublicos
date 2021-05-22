@@ -114,6 +114,20 @@ const createPackage = async (data, ckanServer, apiKey) => {
 		}
 	}
 
+	for (const file of data.files) {
+		try {
+			await sendRequest(
+				ckanMakeRequest(
+					createResourceRequest(
+						file, packageData.id
+					)
+				)
+			);
+		} catch (e) {
+			console.error(e);
+		}
+	}
+
 	return packageData;
 };
 
