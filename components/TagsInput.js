@@ -23,6 +23,7 @@ export default function TagsInput({name, error, options, onChange}) {
 		if (tag && tag !== "")
 			setTags((currentTags) => [tag].concat(currentTags));
 		inputRef.current.value = "";
+		inputRef.current.focus();
 		setSuggestions([]);
 	};
 
