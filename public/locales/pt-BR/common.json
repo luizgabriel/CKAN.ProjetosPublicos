@@ -42,5 +42,6 @@
   "attached_files_1_placeholder": "1 arquivo anexado",
   "attached_files_multiple_placeholder": " arquivos anexados",
   "form_title": "Projetos Públicos",
-  "form_description": "Cadastre um novo projeto público no Dataurbe"
+  "form_description": "Cadastre um novo projeto público no Dataurbe",
+  "attach_image": "Anexar imagem"
 }

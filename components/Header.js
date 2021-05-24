@@ -10,7 +10,7 @@ export default function Header({ baseUrl }) {
 	const supportedLanguages = {
 		"pt-BR": "Português (Brasil)",
 		"en": "English",
-		"es-AR": "Español (Argentina)"
+		"es": "Español"
 	};
 
 	let url = baseUrl || "https://dataurbe.appcivico.com/";

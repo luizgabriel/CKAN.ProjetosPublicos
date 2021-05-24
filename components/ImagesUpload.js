@@ -90,7 +90,7 @@ export default function ImagesUpload({name, onChange}) {
 						{loading ? <LoadingIcon size="10"/> : <PictureIcon size="10"/>}
 					</div>
 					<Button color="blue" textSize="sm" rounded="rounded rounded-t-none" className="w-full">
-                        Anexar imagem
+						{t("attach_image")}
 					</Button>
 				</div>
 			</div>
