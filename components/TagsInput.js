@@ -5,7 +5,7 @@ import Button from "./Button";
 import {InputGroupContext} from "./InputGroup";
 import {FormContext} from "./Form";
 import ArrowRightIcon from "./ArrowRightIcon";
-import FuzzySearch from 'fuzzy-search';
+import FuzzySearch from "fuzzy-search";
 
 export default function TagsInput({name, error, options, onChange}) {
 	const formContext = useContext(FormContext);
