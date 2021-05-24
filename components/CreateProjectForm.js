@@ -14,6 +14,7 @@ import MetaInputList from "./MetaInputList";
 import InputError from "./InputError";
 import FilesUpload from "./FilesUpload";
 import {useTranslation} from "next-i18next";
+import ProgressBar from "./ProgressBar";
 
 const validateData = (data, t) => {
 	const errors = {};
@@ -34,16 +35,6 @@ const validateData = (data, t) => {
 
 	return errors;
 };
-
-function ProgressBar({value, rounded, className}) {
-	rounded = rounded || "rounded";
-
-	return (
-		<div className={`overflow-hidden h-2 text-xs flex ${rounded} bg-gray-200 ${className}`}>
-			<div style={{width: `${value * 100}%`}} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500 transition-all"/>
-		</div>
-	);
-}
 
 export default function CreateProjectForm({initialData, organizations, tags, loadingOrganizations, onSubmit}) {
 	const [data, setData] = useState(initialData || {});
