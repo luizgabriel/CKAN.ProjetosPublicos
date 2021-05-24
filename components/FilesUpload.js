@@ -40,8 +40,8 @@ export default function FilesUpload({name, placeholder, onChange}) {
 			<div className="flex flex-row">
 				<Button color="blue" textSize="sm" className="rounded-r-none w-1/4" onClick={onClickOpenFile}>Anexar arquivos</Button>
 				<div className="w-full bg-gray-100 bg-opacity-50 rounded-l-none rounded-r border focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-200 outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
-					<div className="flex flex-row flex-wrap">
-						<span className="text-xs text-gray-400 mt-1">{placeholderMessage}</span>
+					<div className="flex flex-row flex-wrap items-center h-full">
+						<span className="text-xs text-gray-400">{placeholderMessage}</span>
 					</div>
 				</div>
 			</div>

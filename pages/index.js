@@ -8,13 +8,16 @@ import {createCkanRequest, createPackageRequest, createResourceRequest} from "..
 import {useCkanCredentials, useOrganizations} from "../utils/hooks";
 import Header from "../components/Header";
 import Box from "../components/Box";
-import Modal, {ModalBodyIcon, ModalFooter} from "../components/Modal";
-import ExclamationIcon from "../components/ExclamationIcon";
+import ErrorModal from "../components/ErrorModal";
+import EmptyCredentialsModal from "../components/EmptyCredentialsModal";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import Head from "next/head";
+import {useTranslation} from "next-i18next";
 
-function parseDescription(data) {
-	const objectivesTitle = "Objetivos";
-	const metaDataTitle = "Informações Extra";
-	const benefitsTitle = "Benefício / Beneficiários";
+function parseDescription(data, t) {
+	const objectivesTitle = t("objectives_label");
+	const metaDataTitle = t("other_infos_label");
+	const benefitsTitle = t("benefit_label");
 
 	console.log({formData: data});
 
@@ -71,12 +74,12 @@ relationships_as_subject (list of relationship dictionaries) – see package_rel
 groups (list of dictionaries) – the groups to which the dataset belongs (optional), each group dictionary should have one or more of the following keys which identify an existing group: 'id' (the id of the group, string), or 'name' (the name of the group, string), to see which groups exist call group_list()
 owner_org (string) – the id of the dataset’s owning organization, see organization_list() or organization_list_for_user() for available values (optional)
  */
-function mapFormDataToCreatePackagePayload(data) {
+function mapFormDataToCreatePackagePayload(data, t) {
 	return {
 		name: slugify(data.name.toLowerCase()).slice(0, 100),
 		title: data.name,
 		private: false,
-		notes: parseDescription(data),
+		notes: parseDescription(data, t),
 		tags: data.categories.map((item) => ({
 			name: slugify(item).slice(0, 100),
 		})),
@@ -89,13 +92,13 @@ function mapFormDataToCreatePackagePayload(data) {
 	};
 }
 
-const createPackage = async (data, ckanServer, apiKey) => {
+const createPackage = async (data, ckanServer, apiKey, t) => {
 	const ckanMakeRequest = createCkanRequest(ckanServer, apiKey);
 
 	const packageData = await sendRequest(
 		ckanMakeRequest(
 			createPackageRequest(
-				mapFormDataToCreatePackagePayload(data)
+				mapFormDataToCreatePackagePayload(data, t)
 			)
 		)
 	);
@@ -131,50 +134,18 @@ const createPackage = async (data, ckanServer, apiKey) => {
 	return packageData;
 };
 
-function EmptyCredentialsModal() {
-	return (
-		<Modal>
-			<ModalBodyIcon iconColor="red=600" IconComponent={ExclamationIcon}>
-				<h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-					Não autorizado!
-				</h3>
-				<div className="mt-2">
-					<p className="text-sm text-gray-500">
-						Você não está autenticado para realizar esta ação.
-					</p>
-				</div>
-			</ModalBodyIcon>
-		</Modal>
-	);
-}
-
-function ErrorModal() {
-	return (
-		<Modal>
-			<ModalBodyIcon iconColor="red=600" IconComponent={ExclamationIcon}>
-				<h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
-					Não foi possível se conectar ao DataUrbe!
-				</h3>
-				<div className="mt-2">
-					<p className="text-sm text-gray-500">
-						Algo aconteceu ao tentar se comunicar com o Dataurbe. <br/>
-						É bem provável que as suas credenciais estejam inválidas.
-					</p>
-				</div>
-			</ModalBodyIcon>
-		</Modal>
-	);
-}
 
 export default function CreateProject() {
+	const {t, i18n: { language }} = useTranslation("common");
+
 	const [ckanCredentials, loadingCkanCredentials] = useCkanCredentials();
 	const emptyCredentials = !loadingCkanCredentials && (!ckanCredentials.host || !ckanCredentials.apiKey);
 
 	const [organizations, loadingOrganizations] = useOrganizations(ckanCredentials.host, ckanCredentials.apiKey);
 	const onSubmit = useCallback(async (data) => {
 		if (ckanCredentials && !loadingCkanCredentials) {
-			const response = await createPackage(data, ckanCredentials.host, ckanCredentials.apiKey);
-			window.open(ckanCredentials.host + "dataset/" + response.id);
+			const response = await createPackage(data, ckanCredentials.host, ckanCredentials.apiKey, t);
+			window.location = ckanCredentials.host + "dataset/" + response.id;
 		}
 	}, [ckanCredentials, loadingCkanCredentials]);
 
@@ -182,7 +153,10 @@ export default function CreateProject() {
 
 	return (
 		<>
-			<Header/>
+			<Head>
+				<title>{t("title")}</title>
+			</Head>
+			<Header language={language}/>
 			<Container>
 				{emptyCredentials ? <EmptyCredentialsModal /> : null}
 				{emptyOrganizations ? <ErrorModal/> : null}
@@ -200,3 +174,9 @@ export default function CreateProject() {
 		</>
 	);
 }
+
+export const getStaticProps = async ({ locale }) => ({
+	props: {
+		...await serverSideTranslations(locale, []),
+	},
+})

@@ -13,25 +13,24 @@ import TagsInput from "./TagsInput";
 import MetaInputList from "./MetaInputList";
 import InputError from "./InputError";
 import FilesUpload from "./FilesUpload";
+import {useTranslation} from "next-i18next";
 
-const requiredMessage = (fieldName) => `O campo "${fieldName}" é obrigatório`;
-
-const validateData = (data) => {
+const validateData = (data, t) => {
 	const errors = {};
 	if (!data.name)
-		errors.name = requiredMessage("nome");
+		errors.name = t("name_required");
 
 	if (!data.organization)
-		errors.organization = "Selecione uma organização";
+		errors.organization = t("city_required");
 
 	if (!data.description)
-		errors.description = requiredMessage("descrição");
+		errors.description = t("description_required");
 
 	if (!data.categories || !data.categories.length > 0)
-		errors.categories = "É necessário adicionar ao menos uma categoria";
+		errors.categories = t("categories_required");
 
 	if (!data.benefit)
-		errors.benefit = requiredMessage("benefício e beneficiário");
+		errors.benefit = t("benefit_required");
 
 	return errors;
 };
@@ -40,13 +39,14 @@ export default function CreateProjectForm({initialData, organizations, loadingOr
 	const [data, setData] = useState(initialData || {});
 	const [errors, setErrors] = useState({});
 	const [loading, setLoading] = useState(false);
+	const {t} = useTranslation("common");
 
 	const nameInputRef = useRef();
 	const benefitInputRef = useRef();
 
 	const onClickSubmit = useCallback(() => {
 		setLoading(true);
-		const validationErrors = validateData(data);
+		const validationErrors = validateData(data, t);
 
 		if (Object.entries(validationErrors).length > 0) {
 			setLoading(false);
@@ -60,7 +60,9 @@ export default function CreateProjectForm({initialData, organizations, loadingOr
 			onSubmit(data)
 				.catch((e) => {
 					console.error(e);
-					setErrors({name: "Não foi possível cadastrar este projeto. Este nome já está em uso!"});
+					setErrors({
+						name: t("create_project_error")
+					});
 				})
 				.finally(() => setLoading(false));
 		}
@@ -77,55 +79,55 @@ export default function CreateProjectForm({initialData, organizations, loadingOr
 	return (
 		<Form onChange={setData} errors={errors}>
 			<FormBody>
-				<InputGroup name="name" label="Nome do projeto" className="p-2 w-full">
+				<InputGroup name="name" label={t("name_label")} className="p-2 w-full">
 					<Input ref={nameInputRef}/>
-					<div className="text-xs text-gray-400 mt-1"><b>Exemplo:</b> Reparação da Rua 01</div>
+					<div className="text-xs text-gray-400 mt-1"><b>{t("example")}:</b> {t("name_example")}</div>
 				</InputGroup>
-				<InputGroup name="organization" label="Cidade" className="p-2 w-full">
+				<InputGroup name="organization" label={t("city_label")} className="p-2 w-full">
 					<Select options={organizations}
-					        unselectedText={"Selecione uma cidade" + (loadingOrganizations ? " (carregando...)" : "")}/>
+					        unselectedText={t("city_placeholder") + (loadingOrganizations ? " (" + t("loading") + "...)" : "")}/>
 				</InputGroup>
-				<InputGroup name="description" label="Descrição" className="p-2 w-full">
+				<InputGroup name="description" label={t("description_label")} className="p-2 w-full">
 					<TextArea rows="4"/>
 				</InputGroup>
-				<InputGroup name="objectives" label="Objetivos" className="p-2 w-full">
-					<InputList addButtonText="Adicionar Objetivo"/>
+				<InputGroup name="objectives" label={t("objectives_label")} className="p-2 w-full">
+					<InputList addButtonText={t("add_objectives_button")}/>
 				</InputGroup>
-				<InputGroup name="benefit" label="Benefício / Beneficiários" className="p-2 w-full">
+				<InputGroup name="benefit" label={t("benefit_label")} className="p-2 w-full">
 					<TextArea rows="2" ref={benefitInputRef}/>
 				</InputGroup>
-				<InputGroup name="metaData" label="Outras informações" className="p-2 w-full">
+				<InputGroup name="metaData" label={t("other_infos_label")} className="p-2 w-full">
 					<MetaInputList addButtonText="Adicionar" defaultValue={[
-						{name: "Data de início do projeto", value: "", error: false},
-						{name: "Fim estimado", value: "", error: false},
-						{name: "Tempo estimado (dias úteis)", value: "357", error: false},
-						{name: "Estado do projeto", value: "", error: false},
-						{name: "Licitação", value: "100%", error: false},
-						{name: "Execução", value: "100%", error: false},
-						{name: "Endereço", value: "", error: false},
+						{name: t("start_date_label"), value: "", error: false},
+						{name: t("estimated_end_label"), value: "", error: false},
+						{name: t("estimated_duration_label"), value: "357", error: false},
+						{name: t("project_state_label"), value: "", error: false},
+						{name: t("bidding_label"), value: "100%", error: false},
+						{name: t("execution_label"), value: "100%", error: false},
+						{name: t("address_label"), value: "", error: false},
 					]}/>
 				</InputGroup>
-				<InputGroup name="categories" label="Categorias" className="p-2 w-full">
+				<InputGroup name="categories" label={t("categories_label")} className="p-2 w-full">
 					<TagsInput/>
 				</InputGroup>
-				<InputGroup name="images" label="Imagens" className="p-2 w-full">
+				<InputGroup name="images" label={t("images_label")} className="p-2 w-full">
 					<ImagesUpload/>
 				</InputGroup>
-				<InputGroup name="files" label="Arquivos" className="p-2 w-full">
-					<FilesUpload placeholder="Anexe arquivos ao projeto"/>
+				<InputGroup name="files" label={t("files_label")} className="p-2 w-full">
+					<FilesUpload placeholder={t("files_placeholder")}/>
 				</InputGroup>
 				<div className="border-t border-gray-200 w-full my-4"/>
 				<div className="p-2 w-full flex flex-col items-center justify-center">
 					<Button color="blue" textSize="xl" className="mx-auto px-8 mb-2" onClick={onClickSubmit}>
 						{loading ? <LoadingIcon className="mr-2" size="4"/> : null}
-						Cadastrar no Dataurbe
+						{t("register_button_label")}
 					</Button>
 					{Object.entries(errors).length > 0 ?
 						(<InputError
-							error="Alguns campos obrigatórios não foram preenchidos. Por favor, corrija-os antes de enviar."/>)
+							error={t("validation_error")}/>)
 						: (
 							<span className="text-gray-500 text-sm text-center">
-								Clique para cadastrar este projeto público no Dataurbe
+								{t("register_help_text")}
 							</span>
 						)}
 				</div>
