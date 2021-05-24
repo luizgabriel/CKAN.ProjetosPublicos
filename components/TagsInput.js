@@ -15,7 +15,7 @@ export default function TagsInput({name, error, options, onChange}) {
 	name = name || inputGroupContext.name;
 
 	const searcher = new FuzzySearch(options, {
-		caseSensitive: true,
+		caseSensitive: false,
 	});
 
 	const onAddTag = () => {
