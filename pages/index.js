@@ -156,7 +156,7 @@ export default function CreateProject() {
 			<Head>
 				<title>{t("title")}</title>
 			</Head>
-			<Header />
+			<Header baseUrl={ckanCredentials.host} />
 			<Container>
 				{emptyCredentials ? <EmptyCredentialsModal /> : null}
 				{emptyOrganizations ? <ErrorModal/> : null}

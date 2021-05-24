@@ -1,7 +1,7 @@
 import SearchIcon from "./SearchIcon";
 import {useTranslation} from "next-i18next";
 
-export default function Header() {
+export default function Header({ baseUrl }) {
 	const {t, i18n: { language }} = useTranslation("common");
 	const onChangeLanguage = (e) => {
 		window.location = "/" + e.target.value;
@@ -13,6 +13,10 @@ export default function Header() {
 		"es-AR": "Español (Argentina)"
 	};
 
+	let url = baseUrl || "https://dataurbe.appcivico.com/";
+	if (!url.endsWith("/"))
+		url += "/";
+
 	return (
 		<div className="text-gray-600 body-font relative" style={{backgroundColor: "#13326B", backgroundImage: "url(/bg.png)", height: 115}}>
 			<div className="container px-5 py-10 mx-auto flex flex-row mx-10">
@@ -20,10 +24,10 @@ export default function Header() {
 					<img src="/fgv-data.png" alt="Dataurbe" className="h-7"/>
 				</div>
 				<div className="flex flex-row mt-5 mb-5 text-lg ml-auto">
-					<a className="text-white mr-2" href="https://dataurbe.appcivico.com/dataset">{t("datasets_menu")}</a>
+					<a className="text-white mr-2" href={url + "dataset"}>{t("datasets_menu")}</a>
 					<span className="text-white mr-2">|</span>
-					<a className="text-white" href="https://dataurbe.appcivico.com/organization">{t("cities_menu")}</a>
-					<form method="get" action="https://dataurbe.appcivico.com/dataset" className="relative">
+					<a className="text-white" href={url + "organization"}>{t("cities_menu")}</a>
+					<form method="get" action={url + "dataset"} className="relative">
 						<input className="bg-white px-2 py-0 text-sm border rounded ml-2" name="q" placeholder={t("search_placeholder")}/>
 						<button type="submit" className="absolute right-1 top-2">
 							<SearchIcon size="4"/>
