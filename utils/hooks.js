@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {sendRequest} from "./request";
-import {createCkanRequest, getOrganizationsRequest} from "./ckan";
+import {createCkanRequest, getOrganizationsRequest, getTagsRequest} from "./ckan";
 
 function mapOrganizationToOption(organization) {
 	return {
@@ -47,6 +47,28 @@ export function useCkanCredentials() {
 			.then(setResult)
 			.then(() => setLoading(false));
 	}, []);
+
+	return [result, loading];
+}
+
+const getTags = (ckanServer, apiKey) => sendRequest(
+	createCkanRequest(ckanServer, apiKey)(
+		getTagsRequest(true)
+	)
+);
+
+export function useTags(ckanServer, apiKey)
+{
+	const [result, setResult] = useState([]);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		if (ckanServer && apiKey)
+			getTags(ckanServer, apiKey)
+				.then(setResult)
+				.catch((e) => console.error(e))
+				.finally(() => setLoading(false));
+	}, [ckanServer, apiKey]);
 
 	return [result, loading];
 }

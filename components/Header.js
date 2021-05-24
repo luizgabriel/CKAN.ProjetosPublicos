@@ -1,10 +1,16 @@
 import SearchIcon from "./SearchIcon";
 import {useTranslation} from "next-i18next";
 
-export default function Header({language}) {
-	const {t} = useTranslation("common");
+export default function Header() {
+	const {t, i18n: { language }} = useTranslation("common");
 	const onChangeLanguage = (e) => {
 		window.location = "/" + e.target.value;
+	};
+
+	const supportedLanguages = {
+		"pt-BR": "Português (Brasil)",
+		"en": "English",
+		"es-AR": "Español (Argentina)"
 	};
 
 	return (
@@ -24,9 +30,9 @@ export default function Header({language}) {
 						</button>
 					</form>
 					<select value={language} onChange={onChangeLanguage} className="border border-white rounded-sm px-2 py-0 text-white text-xs uppercase ml-2 mt-1" style={{backgroundColor: "#13326B", height: "22px"}}>
-						<option value="pt-BR">Português (Brasil)</option>
-						<option value="en">English</option>
-						<option value="es-AR">Español (Argentina)</option>
+						{Object.entries(supportedLanguages).map(([value, name]) => (
+							<option key={value} value={value}>{name}</option>
+						))}
 					</select>
 				</div>
 			</div>

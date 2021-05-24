@@ -35,7 +35,7 @@ const validateData = (data, t) => {
 	return errors;
 };
 
-export default function CreateProjectForm({initialData, organizations, loadingOrganizations, onSubmit}) {
+export default function CreateProjectForm({initialData, organizations, tags, loadingOrganizations, onSubmit}) {
 	const [data, setData] = useState(initialData || {});
 	const [errors, setErrors] = useState({});
 	const [loading, setLoading] = useState(false);
@@ -108,7 +108,7 @@ export default function CreateProjectForm({initialData, organizations, loadingOr
 					]}/>
 				</InputGroup>
 				<InputGroup name="categories" label={t("categories_label")} className="p-2 w-full">
-					<TagsInput/>
+					<TagsInput options={tags}/>
 				</InputGroup>
 				<InputGroup name="images" label={t("images_label")} className="p-2 w-full">
 					<ImagesUpload/>

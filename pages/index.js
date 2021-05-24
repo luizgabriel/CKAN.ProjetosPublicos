@@ -5,7 +5,7 @@ import CreateProjectForm from "../components/CreateProjectForm";
 import {sendRequest} from "../utils/request";
 import slugify from "slugify";
 import {createCkanRequest, createPackageRequest, createResourceRequest} from "../utils/ckan";
-import {useCkanCredentials, useOrganizations} from "../utils/hooks";
+import {useCkanCredentials, useOrganizations, useTags} from "../utils/hooks";
 import Header from "../components/Header";
 import Box from "../components/Box";
 import ErrorModal from "../components/ErrorModal";
@@ -18,8 +18,6 @@ function parseDescription(data, t) {
 	const objectivesTitle = t("objectives_label");
 	const metaDataTitle = t("other_infos_label");
 	const benefitsTitle = t("benefit_label");
-
-	console.log({formData: data});
 
 	const nonEmptyString = (str) => str && String(str).trim() !== "";
 
@@ -136,10 +134,12 @@ const createPackage = async (data, ckanServer, apiKey, t) => {
 
 
 export default function CreateProject() {
-	const {t, i18n: { language }} = useTranslation("common");
+	const {t} = useTranslation("common");
 
 	const [ckanCredentials, loadingCkanCredentials] = useCkanCredentials();
 	const emptyCredentials = !loadingCkanCredentials && (!ckanCredentials.host || !ckanCredentials.apiKey);
+
+	const [tags,] = useTags(ckanCredentials.host, ckanCredentials.apiKey);
 
 	const [organizations, loadingOrganizations] = useOrganizations(ckanCredentials.host, ckanCredentials.apiKey);
 	const onSubmit = useCallback(async (data) => {
@@ -156,18 +156,19 @@ export default function CreateProject() {
 			<Head>
 				<title>{t("title")}</title>
 			</Head>
-			<Header language={language}/>
+			<Header />
 			<Container>
 				{emptyCredentials ? <EmptyCredentialsModal /> : null}
 				{emptyOrganizations ? <ErrorModal/> : null}
 				<Box>
 					<FormHeader
-						title="Projetos Públicos"
-						description="Cadastre um novo projeto público no Dataurbe"/>
+						title={t("form_title")}
+						description={t("form_description")}/>
 
 					<CreateProjectForm
 						organizations={organizations}
 						loadingOrganizations={loadingOrganizations}
+						tags={tags}
 						onSubmit={onSubmit}/>
 				</Box>
 			</Container>

@@ -24,6 +24,11 @@ export const createPackageRequest = (data) => ({
 	data,
 });
 
+export const getTagsRequest = () => ({
+	method: "GET",
+	url: "tag_list",
+});
+
 export const createResourceRequest = (upload, packageId) => {
 	const nameParts = upload.name.split(".");
 	const data = new FormData();

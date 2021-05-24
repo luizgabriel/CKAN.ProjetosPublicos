@@ -37,5 +37,10 @@
   "unauthorized_modal_description": "Você não está autenticado para realizar esta ação.",
   "datasets_menu": "Conjunto de dados",
   "cities_menu": "Cidades",
-  "search_placeholder": "Pesquisar"
+  "search_placeholder": "Pesquisar",
+  "attach_files": "Anexar arquivos",
+  "attached_files_1_placeholder": "1 arquivo anexado",
+  "attached_files_multiple_placeholder": " arquivos anexados",
+  "form_title": "Projetos Públicos",
+  "form_description": "Cadastre um novo projeto público no Dataurbe"
 }

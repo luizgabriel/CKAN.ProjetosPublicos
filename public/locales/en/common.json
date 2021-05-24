@@ -37,5 +37,10 @@
   "unauthorized_modal_description": "You are not authenticated to perform this action.",
   "datasets_menu": "Datasets",
   "cities_menu": "Cities",
-  "search_placeholder": "Search"
+  "search_placeholder": "Search",
+  "attach_files": "Attach files",
+  "attached_files_1_placeholder": "1 attached file",
+  "attached_files_multiple_placeholder": " attached files",
+  "form_title": "Public Projects",
+  "form_description": "Register a new public project in Dataurbe"
 }
