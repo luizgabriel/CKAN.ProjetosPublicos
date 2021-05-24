@@ -57,7 +57,6 @@ export default function TagsInput({name, error, options, onChange}) {
 
 	const onOptionKeyDown = (suggestion) => (e) => {
 		if (e.key === "Enter") {
-			console.log(e.key, suggestion);
 			onClickSuggestion(suggestion)(e);
 		}
 	};
