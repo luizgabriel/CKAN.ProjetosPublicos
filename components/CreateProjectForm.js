@@ -35,10 +35,21 @@ const validateData = (data, t) => {
 	return errors;
 };
 
+function ProgressBar({value, rounded, className}) {
+	rounded = rounded || "rounded";
+
+	return (
+		<div className={`overflow-hidden h-2 text-xs flex ${rounded} bg-gray-200 ${className}`}>
+			<div style={{width: `${value * 100}%`}} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-green-500"/>
+		</div>
+	);
+}
+
 export default function CreateProjectForm({initialData, organizations, tags, loadingOrganizations, onSubmit}) {
 	const [data, setData] = useState(initialData || {});
 	const [errors, setErrors] = useState({});
 	const [loading, setLoading] = useState(false);
+	const [progressValue, setProgressValue] = useState(0);
 	const {t} = useTranslation("common");
 
 	const nameInputRef = useRef();
@@ -57,7 +68,7 @@ export default function CreateProjectForm({initialData, organizations, tags, loa
 
 		} else {
 			setErrors({});
-			onSubmit(data)
+			onSubmit(data, setProgressValue)
 				.catch((e) => {
 					console.error(e);
 					setErrors({
@@ -73,7 +84,6 @@ export default function CreateProjectForm({initialData, organizations, tags, loa
 			nameInputRef.current.scrollIntoView({behavior: "smooth", block: "center"});
 		else if (errors.benefit && benefitInputRef.current && benefitInputRef.current.scrollIntoView)
 			benefitInputRef.current.scrollIntoView({behavior: "smooth", block: "center"});
-
 	}, [errors, nameInputRef, benefitInputRef]);
 
 	return (
@@ -118,10 +128,13 @@ export default function CreateProjectForm({initialData, organizations, tags, loa
 				</InputGroup>
 				<div className="border-t border-gray-200 w-full my-4"/>
 				<div className="p-2 w-full flex flex-col items-center justify-center">
-					<Button color="blue" textSize="xl" className="mx-auto px-8 mb-2" onClick={onClickSubmit}>
-						{loading ? <LoadingIcon className="mr-2" size="4"/> : null}
-						{t("register_button_label")}
-					</Button>
+					<div className="flex flex-col">
+						{loading ? <ProgressBar value={progressValue} rounded="rounded rounded-b-none" /> : null}
+						<Button color="blue" textSize="xl" className="mx-auto px-8 mb-2" rounded={loading ? "rounded rounded-t-none" : "rounded"} onClick={onClickSubmit}>
+							{loading ? <LoadingIcon className="mr-2" size="4"/> : null}
+							{t("register_button_label")}
+						</Button>
+					</div>
 					{Object.entries(errors).length > 0 ?
 						(<InputError
 							error={t("validation_error")}/>)

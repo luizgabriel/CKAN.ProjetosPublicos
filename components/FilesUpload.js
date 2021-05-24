@@ -7,7 +7,7 @@ import {useTranslation} from "next-i18next";
 
 
 export default function FilesUpload({name, placeholder, onChange}) {
-	const {t} = useTranslation('common');
+	const {t} = useTranslation("common");
 	const inputGroupContext = useContext(InputGroupContext);
 	const formContext = useContext(FormContext);
 	name = name || inputGroupContext.name;

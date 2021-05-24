@@ -1,6 +1,7 @@
 import {useEffect, useState} from "react";
 import {sendRequest} from "./request";
 import {createCkanRequest, getOrganizationsRequest, getTagsRequest} from "./ckan";
+import {sortedUniq, sortBy} from "lodash";
 
 function mapOrganizationToOption(organization) {
 	return {
@@ -65,6 +66,9 @@ export function useTags(ckanServer, apiKey)
 	useEffect(() => {
 		if (ckanServer && apiKey)
 			getTags(ckanServer, apiKey)
+				.then((tags) => tags.map((t) => String(t).toLowerCase()))
+				.then((tags) => sortBy(tags))
+				.then((tags) => sortedUniq(tags))
 				.then(setResult)
 				.catch((e) => console.error(e))
 				.finally(() => setLoading(false));

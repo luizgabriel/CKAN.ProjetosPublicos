@@ -90,9 +90,12 @@ function mapFormDataToCreatePackagePayload(data, t) {
 	};
 }
 
-const createPackage = async (data, ckanServer, apiKey, t) => {
+const createPackage = async (data, ckanServer, apiKey, t, onUpdateProgress) => {
 	const ckanMakeRequest = createCkanRequest(ckanServer, apiKey);
+	const total = 1 + data.images.length + data.files.length;
+	let current = 0;
 
+	onUpdateProgress(0);
 	const packageData = await sendRequest(
 		ckanMakeRequest(
 			createPackageRequest(
@@ -100,6 +103,7 @@ const createPackage = async (data, ckanServer, apiKey, t) => {
 			)
 		)
 	);
+	onUpdateProgress(current++ / total);
 
 	for (const image of data.images) {
 		try {
@@ -110,6 +114,7 @@ const createPackage = async (data, ckanServer, apiKey, t) => {
 					)
 				)
 			);
+			onUpdateProgress(current++ / total);
 		} catch (e) {
 			console.error(e);
 		}
@@ -124,6 +129,7 @@ const createPackage = async (data, ckanServer, apiKey, t) => {
 					)
 				)
 			);
+			onUpdateProgress(current++ / total);
 		} catch (e) {
 			console.error(e);
 		}
@@ -142,9 +148,9 @@ export default function CreateProject() {
 	const [tags,] = useTags(ckanCredentials.host, ckanCredentials.apiKey);
 
 	const [organizations, loadingOrganizations] = useOrganizations(ckanCredentials.host, ckanCredentials.apiKey);
-	const onSubmit = useCallback(async (data) => {
+	const onSubmit = useCallback(async (data, onUpdateProgress) => {
 		if (ckanCredentials && !loadingCkanCredentials) {
-			const response = await createPackage(data, ckanCredentials.host, ckanCredentials.apiKey, t);
+			const response = await createPackage(data, ckanCredentials.host, ckanCredentials.apiKey, t, onUpdateProgress);
 			window.location = ckanCredentials.host + "dataset/" + response.id;
 		}
 	}, [ckanCredentials, loadingCkanCredentials]);

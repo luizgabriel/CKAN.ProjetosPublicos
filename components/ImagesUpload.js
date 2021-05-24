@@ -6,6 +6,7 @@ import Button from "./Button";
 import {useContext, useEffect, useRef, useState} from "react";
 import {FormContext} from "./Form";
 import {InputGroupContext} from "./InputGroup";
+import {useTranslation} from "next-i18next";
 
 /**
  * @param file {File}
@@ -23,6 +24,7 @@ function readFileAsDataURL(file) {
 export default function ImagesUpload({name, onChange}) {
 	const inputGroupContext = useContext(InputGroupContext);
 	const formContext = useContext(FormContext);
+	const {t} = useTranslation("common");
 	name = name || inputGroupContext.name;
 
 	const fileInputRef = useRef();
