@@ -84,7 +84,7 @@ function mapFormDataToCreatePackagePayload(data, t) {
 		owner_org: data.organization,
 		groups: [
 			{
-				name: "projetos-publicos"
+				name: "acompanhamento-de-projetos"
 			}
 		]
 	};
