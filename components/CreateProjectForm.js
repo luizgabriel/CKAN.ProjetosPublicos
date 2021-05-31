@@ -30,9 +30,6 @@ const validateData = (data, t) => {
 	if (!data.categories || !data.categories.length > 0)
 		errors.categories = t("categories_required");
 
-	if (!data.benefit)
-		errors.benefit = t("benefit_required");
-
 	return errors;
 };
 
@@ -44,7 +41,6 @@ export default function CreateProjectForm({initialData, organizations, tags, loa
 	const {t} = useTranslation("common");
 
 	const nameInputRef = useRef();
-	const benefitInputRef = useRef();
 
 	const onClickSubmit = useCallback(() => {
 		setLoading(true);
@@ -73,9 +69,7 @@ export default function CreateProjectForm({initialData, organizations, tags, loa
 	useEffect(() => {
 		if (errors.name && nameInputRef.current && nameInputRef.current.scrollIntoView)
 			nameInputRef.current.scrollIntoView({behavior: "smooth", block: "center"});
-		else if (errors.benefit && benefitInputRef.current && benefitInputRef.current.scrollIntoView)
-			benefitInputRef.current.scrollIntoView({behavior: "smooth", block: "center"});
-	}, [errors, nameInputRef, benefitInputRef]);
+	}, [errors, nameInputRef]);
 
 	return (
 		<Form onChange={setData} errors={errors}>
@@ -95,7 +89,7 @@ export default function CreateProjectForm({initialData, organizations, tags, loa
 					<InputList addButtonText={t("add_objectives_button")}/>
 				</InputGroup>
 				<InputGroup name="benefit" label={t("benefit_label")} className="p-2 w-full">
-					<TextArea rows="2" ref={benefitInputRef}/>
+					<TextArea rows="2" />
 				</InputGroup>
 				<InputGroup name="metaData" label={t("other_infos_label")} className="p-2 w-full">
 					<MetaInputList addButtonText="Adicionar" defaultValue={[
