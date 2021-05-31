@@ -91,6 +91,9 @@ export default function CreateProjectForm({initialData, organizations, tags, loa
 				<InputGroup name="benefit" label={t("benefit_label")} className="p-2 w-full">
 					<TextArea rows="2" />
 				</InputGroup>
+				<InputGroup name="observations" label={t("observations_label")} className="p-2 w-full">
+					<TextArea rows="2" />
+				</InputGroup>
 				<InputGroup name="metaData" label={t("other_infos_label")} className="p-2 w-full">
 					<MetaInputList addButtonText="Adicionar" defaultValue={[
 						{name: t("start_date_label"), value: "", error: false},

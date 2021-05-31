@@ -18,14 +18,11 @@ function parseDescription(data, t) {
 	const objectivesTitle = t("objectives_label");
 	const metaDataTitle = t("other_infos_label");
 	const benefitsTitle = t("benefit_label");
+	const observationsTitle = t("observations_label");
 
 	const nonEmptyString = (str) => str && String(str).trim() !== "";
 
 	let description = data.description;
-
-	if (nonEmptyString(data.benefit)) {
-		description += `\n\n#### ${benefitsTitle}\n${data.benefit}`;
-	}
 
 	const objectives = (data.objectives || []).filter((item) => nonEmptyString(item.value));
 	if (objectives.length > 0) {
@@ -35,6 +32,14 @@ function parseDescription(data, t) {
 		}
 
 		description += objectivesText;
+	}
+
+	if (nonEmptyString(data.benefit)) {
+		description += `\n\n#### ${benefitsTitle}\n${data.benefit}`;
+	}
+
+	if (nonEmptyString(data.observations)) {
+		description += `\n\n#### ${observationsTitle}\n${data.observations}`;
 	}
 
 	const metaData = (data.metaData || []).filter((item) => nonEmptyString(item.name));

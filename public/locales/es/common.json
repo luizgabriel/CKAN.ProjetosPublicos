@@ -43,5 +43,6 @@
   "attached_files_multiple_placeholder": " archivos adjuntos",
   "form_title": "Proyectos Públicos",
   "form_description": "Registrar un nuevo proyecto público en Dataurbe",
-  "attach_image": "Adjuntar imagen"
+  "attach_image": "Adjuntar imagen",
+  "observations_label": "Observaciones"
 }
