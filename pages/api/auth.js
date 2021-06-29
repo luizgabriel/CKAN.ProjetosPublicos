@@ -1,11 +1,11 @@
 import withSession from "../../utils/session";
 
 function translateCkanLangToInternalLang(ckanLang) {
-	if (ckanLang.startsWith("pt"))
+	if (String(ckanLang).startsWith("pt"))
 		return "pt-BR";
-	else if (ckanLang.startsWith("en"))
+	else if (String(ckanLang).startsWith("en"))
 		return "en";
-	else if (ckanLang.startsWith("es"))
+	else if (String(ckanLang).startsWith("es"))
 		return "es";
 
 	return "";
